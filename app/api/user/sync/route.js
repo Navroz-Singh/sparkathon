@@ -1,0 +1,186 @@
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import connectDB from '@/lib/mongodb'
+import User from '@/models/User'
+
+export async function POST(req) {
+    try {
+        // Check if user is authenticated
+        const supabase = await createClient()
+        const { data: { user }, error } = await supabase.auth.getUser()
+
+        if (error || !user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        // Connect to database
+        await connectDB()
+
+        // Check if user exists in MongoDB
+        let mongoUser = await User.findOne({ supabaseId: user.id })
+
+        if (!mongoUser) {
+            // NEW USER: Create with Supabase data as initial values
+            mongoUser = await User.create({
+                supabaseId: user.id,
+                email: user.email,
+                name: user.user_metadata?.full_name || user.email.split('@')[0],
+                avatar: user.user_metadata?.avatar_url || '',
+                role: 'Buyer', // Default role for shopping app
+                addresses: [],
+                preferences: {
+                    categories: [],
+                    priceRange: { min: 0, max: 1000 },
+                    currency: 'USD',
+                    notifications: {
+                        email: true,
+                        push: true,
+                        orderUpdates: true,
+                        deals: true,
+                        newArrivals: false,
+                    },
+                    privacy: {
+                        showEmail: false,
+                        profileVisibility: 'public',
+                    }
+                },
+                searchHistory: [],
+                viewedProducts: [],
+                wishlist: [],
+                cart: [],
+                orders: [],
+                reviews: [],
+                lastActive: new Date(),
+                // Track whether profile fields have been manually edited
+                profileEditedFields: {
+                    name: false,
+                    avatar: false,
+                    preferences: false
+                }
+            })
+        } else {
+            // EXISTING USER: Only sync essential auth data, preserve profile edits
+            const updateData = {
+                lastActive: new Date(),
+            }
+
+            // ONLY sync email (auth-critical data)
+            if (user.email && user.email !== mongoUser.email) {
+                updateData.email = user.email
+            }
+
+            // CONDITIONALLY sync name and avatar ONLY if user hasn't edited them
+            if (!mongoUser.profileEditedFields?.name &&
+                user.user_metadata?.full_name &&
+                user.user_metadata.full_name !== mongoUser.name) {
+                updateData.name = user.user_metadata.full_name
+            }
+
+            if (!mongoUser.profileEditedFields?.avatar &&
+                user.user_metadata?.avatar_url &&
+                user.user_metadata.avatar_url !== mongoUser.avatar) {
+                updateData.avatar = user.user_metadata.avatar_url
+            }
+
+            // Initialize missing fields for existing users (one-time migration)
+            if (!mongoUser.preferences) {
+                updateData.preferences = {
+                    categories: [],
+                    priceRange: { min: 0, max: 1000 },
+                    currency: 'USD',
+                    notifications: {
+                        email: true,
+                        push: true,
+                        orderUpdates: true,
+                        deals: true,
+                        newArrivals: false,
+                    },
+                    privacy: {
+                        showEmail: false,
+                        profileVisibility: 'public',
+                    }
+                }
+            }
+
+            if (!mongoUser.searchHistory) {
+                updateData.searchHistory = []
+            }
+
+            if (!mongoUser.viewedProducts) {
+                updateData.viewedProducts = []
+            }
+
+            if (!mongoUser.wishlist) {
+                updateData.wishlist = []
+            }
+
+            if (!mongoUser.cart) {
+                updateData.cart = []
+            }
+
+            if (!mongoUser.orders) {
+                updateData.orders = []
+            }
+
+            if (!mongoUser.reviews) {
+                updateData.reviews = []
+            }
+
+            // Initialize profileEditedFields for existing users
+            if (!mongoUser.profileEditedFields) {
+                updateData.profileEditedFields = {
+                    name: false,
+                    avatar: false,
+                    preferences: false
+                }
+            }
+
+            mongoUser = await User.findByIdAndUpdate(
+                mongoUser._id,
+                updateData,
+                { new: true, runValidators: true }
+            )
+        }
+
+        // Return safe user data for shopping app
+        const safeUserData = {
+            _id: mongoUser._id,
+            supabaseId: mongoUser.supabaseId,
+            email: mongoUser.email,
+            name: mongoUser.name,
+            avatar: mongoUser.avatar,
+            role: mongoUser.role,
+            addresses: mongoUser.addresses,
+            preferences: mongoUser.preferences,
+            searchHistory: mongoUser.searchHistory,
+            viewedProducts: mongoUser.viewedProducts,
+            wishlist: mongoUser.wishlist,
+            cart: mongoUser.cart,
+            orders: mongoUser.orders,
+            reviews: mongoUser.reviews,
+            createdAt: mongoUser.createdAt,
+            lastActive: mongoUser.lastActive,
+        }
+
+        return NextResponse.json({ user: safeUserData }, { status: 200 })
+    } catch (error) {
+        console.error('User sync error:', error)
+
+        // Handle validation errors
+        if (error.name === 'ValidationError') {
+            return NextResponse.json({
+                error: 'User data validation failed',
+                details: error.message
+            }, { status: 400 })
+        }
+
+        // Handle duplicate key errors
+        if (error.code === 11000) {
+            return NextResponse.json({
+                error: 'User already exists with this email or Supabase ID'
+            }, { status: 409 })
+        }
+
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+}
