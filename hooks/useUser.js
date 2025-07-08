@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 export function useUser() {
     const [user, setUser] = useState(null)
@@ -197,6 +197,32 @@ export function useUser() {
         setLoading(false)
     }
 
+    const changePassword = useCallback(async (currentPassword, newPassword) => {
+        try {
+            const response = await fetch('/api/account/security/password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword
+                })
+            })
+
+            const result = await response.json()
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Failed to change password')
+            }
+
+            return { success: true }
+        } catch (error) {
+            console.error('Password change error:', error)
+            return { success: false, error: error.message }
+        }
+    }, [])
+
     return {
         user,
         loading,
@@ -204,6 +230,7 @@ export function useUser() {
         signIn,
         signUp,
         signOut,
-        refreshUser
+        refreshUser,
+        changePassword
     }
 }

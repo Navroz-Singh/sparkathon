@@ -1,0 +1,83 @@
+├── app
+│   ├── account
+│   │   ├── addresses
+│   │   │   └── page.js
+│   │   ├── orders
+│   │   │   ├── [id]
+│   │   │   │   └── page.js
+│   │   │   └── page.js
+│   │   ├── profile
+│   │   │   └── page.js
+│   │   ├── layout.js
+│   │   └── page.js
+│   ├── api
+│   │   ├── account
+│   │   │   ├── addresses
+│   │   │   │   ├── [id]
+│   │   │   │   │   └── route.js
+│   │   │   │   ├── default
+│   │   │   │   │   └── route.js
+│   │   │   │   └── route.js
+│   │   │   ├── orders
+│   │   │   │   ├── [id]
+│   │   │   │   │   ├── cancel
+│   │   │   │   │   │   └── route.js
+│   │   │   │   │   ├── reorder
+│   │   │   │   │   │   └── route.js
+│   │   │   │   │   └── route.js
+│   │   │   │   └── route.js
+│   │   │   └── profile
+│   │   │       └── route.js
+│   │   ├── upload
+│   │   │   └── profile-picture
+│   │   │       └── route.js
+│   │   └── user
+│   │       └── sync
+│   │           └── route.js
+│   ├── login
+│   │   └── page.js
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.js
+│   └── page.js
+├── components
+│   ├── account
+│   │   └── AccountSidebar.js
+│   ├── ui
+│   │   └── LoadingSpinner.js
+│   ├── ForYouSection.js
+│   ├── HeroSection.js
+│   ├── Navbar.js
+│   └── PopularProductsSection.js
+├── hooks
+│   ├── useAccountData.js
+│   ├── useAddresses.js
+│   ├── useOrders.js
+│   └── useUser.js
+├── lib
+│   ├── supabase
+│   │   ├── client.js
+│   │   └── server.js
+│   ├── validations
+│   │   └── userValidation.js
+│   ├── mongodb.js
+│   └── store.js
+├── models
+│   ├── Order.js
+│   └── User.js
+├── utils
+│   ├── addressUtils.js
+│   ├── navbar-wrapper.js
+│   └── redux-provider.js
+├── .env.local
+├── .gitignore
+├── eslint.config.mjs
+├── generate-tree.js
+├── getcode.js
+├── jsconfig.json
+├── next.config.mjs
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── README.md
+└── temp.txt

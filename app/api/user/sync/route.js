@@ -26,6 +26,11 @@ export async function POST(req) {
                 email: user.email,
                 name: user.user_metadata?.full_name || user.email.split('@')[0],
                 avatar: user.user_metadata?.avatar_url || '',
+                profile: {
+                    name: user.user_metadata?.full_name || user.email.split('@')[0],
+                    avatar: user.user_metadata?.avatar_url || '',
+                    phone: ''
+                },
                 role: 'Buyer', // Default role for shopping app
                 addresses: [],
                 preferences: {
@@ -73,13 +78,17 @@ export async function POST(req) {
             if (!mongoUser.profileEditedFields?.name &&
                 user.user_metadata?.full_name &&
                 user.user_metadata.full_name !== mongoUser.name) {
+                // Update both root-level and nested profile name to keep data in sync
                 updateData.name = user.user_metadata.full_name
+                updateData["profile.name"] = user.user_metadata.full_name
             }
 
             if (!mongoUser.profileEditedFields?.avatar &&
                 user.user_metadata?.avatar_url &&
                 user.user_metadata.avatar_url !== mongoUser.avatar) {
+                // Update both root-level and nested profile avatar to keep data in sync
                 updateData.avatar = user.user_metadata.avatar_url
+                updateData["profile.avatar"] = user.user_metadata.avatar_url
             }
 
             // Initialize missing fields for existing users (one-time migration)
@@ -150,6 +159,7 @@ export async function POST(req) {
             name: mongoUser.name,
             avatar: mongoUser.avatar,
             role: mongoUser.role,
+            profile: mongoUser.profile,
             addresses: mongoUser.addresses,
             preferences: mongoUser.preferences,
             searchHistory: mongoUser.searchHistory,

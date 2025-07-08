@@ -37,6 +37,14 @@ export default function Navbar() {
         return 'U'
     }
 
+    // Get user display name
+    const getUserDisplayName = (user) => {
+        if (user?.profile?.name) return user.profile.name
+        if (user?.name) return user.name
+        if (user?.email) return user.email.split('@')[0]
+        return 'User'
+    }
+
     return (
         <div className="w-full">
             {/* Main Navigation Bar */}
@@ -118,50 +126,60 @@ export default function Navbar() {
 
                             {/* User Authentication Section */}
                             {loading ? (
-                                <div className="w-8 h-8 animate-pulse bg-gray-200 rounded-full"></div>
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-8 h-8 animate-pulse bg-gray-200 rounded-full"></div>
+                                    <div className="w-20 h-4 animate-pulse bg-gray-200 rounded"></div>
+                                </div>
                             ) : user ? (
-                                /* Logged In: User Avatar/Menu */
+                                /* Logged In: User Avatar and Name */
                                 <div className="relative">
                                     <button
                                         onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                                        className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                        className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200"
                                     >
-                                        {user.avatar ? (
+                                        {/* User Avatar */}
+                                        {user.profile?.avatar || user.avatar ? (
                                             <img
-                                                src={user.avatar}
-                                                alt={user.name || 'User'}
+                                                src={user.profile?.avatar || user.avatar}
+                                                alt={getUserDisplayName(user)}
                                                 className="w-8 h-8 rounded-full object-cover border-2 border-gray-300"
                                             />
                                         ) : (
                                             <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-xs font-medium">
-                                                {getUserInitials(user.name, user.email)}
+                                                {getUserInitials(getUserDisplayName(user), user.email)}
                                             </div>
                                         )}
-                                        <ChevronDownIcon className="h-4 w-4 text-gray-600" />
+
+                                        {/* User Name */}
+                                        <div className="flex items-center space-x-1">
+                                            <span className="text-sm font-medium text-black max-w-24 truncate">
+                                                {getUserDisplayName(user)}
+                                            </span>
+                                            <ChevronDownIcon className="h-4 w-4 text-gray-600" />
+                                        </div>
                                     </button>
 
-                                    {/* User Dropdown Menu */}
                                     {/* User Dropdown Menu */}
                                     {isUserMenuOpen && (
                                         <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border-2 border-black z-50">
                                             <div className="py-2">
                                                 {/* User Info */}
                                                 <div className="px-4 py-3 border-b border-gray-200">
-                                                    <p className="text-sm font-medium text-black">{user.name || 'User'}</p>
+                                                    <p className="text-sm font-medium text-black">{getUserDisplayName(user)}</p>
                                                     <p className="text-xs text-gray-600 truncate">{user.email}</p>
                                                 </div>
 
                                                 {/* Menu Items */}
                                                 <Link
                                                     href="/account"
-                                                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2"
+                                                    className="flex items-center mt-1 px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2"
                                                     onClick={() => setIsUserMenuOpen(false)}
                                                 >
                                                     <UserIcon className="h-4 w-4 mr-2" />
                                                     My Account
                                                 </Link>
                                                 <Link
-                                                    href="/orders"
+                                                    href="/account/orders"
                                                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2"
                                                     onClick={() => setIsUserMenuOpen(false)}
                                                 >
@@ -182,10 +200,10 @@ export default function Navbar() {
                                                 {/* Divider */}
                                                 <div className="border-t border-gray-200 my-2"></div>
 
-                                                {/* Sign Out - Updated with Red Background */}
+                                                {/* Sign Out */}
                                                 <button
                                                     onClick={handleSignOut}
-                                                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-red-600 hover:text-white rounded-lg ml-2 mr-2"
+                                                    className="w-51 flex items-center px-4 py-2 text-sm text-gray-700 hover:text-white hover:bg-red-600 rounded-lg mx-2"
                                                 >
                                                     <ArrowRightStartOnRectangleIcon className="h-4 w-4 mr-2" />
                                                     Sign Out
@@ -217,62 +235,50 @@ export default function Navbar() {
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
                     <div className="md:hidden bg-white border-t border-gray-200">
-                        <div className="px-6 py-4 space-y-4">
-                            {/* Mobile Search */}
-                            <div className="relative flex items-center">
-                                <div className="relative flex-1">
-                                    <input
-                                        type="text"
-                                        placeholder="Search products..."
-                                        className="w-full pl-4 pr-12 py-2 text-sm border-2 border-black rounded-full bg-white text-black placeholder:text-gray-500 focus:ring-2 focus:ring-black focus:border-black focus:outline-none"
-                                    />
-                                    <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-black">
-                                        <MagnifyingGlassIcon className="h-4 w-4" />
-                                    </button>
-                                </div>
-                                {/* Mobile AI Button with Icon and Tooltip */}
-                                <button
-                                    className="ml-2 px-3 py-2 bg-black text-white rounded-full flex items-center justify-center"
-                                    title="Search using AI"
-                                >
-                                    <SparklesIcon className="h-4 w-4" />
-                                </button>
-                            </div>
+                        <div className="px-6 py-4 space-y-4">                            
 
                             {/* Mobile User Section */}
                             {loading ? (
                                 <div className="flex items-center p-2">
-                                    <div className="w-8 h-8 animate-pulse bg-gray-200 rounded-full mr-3"></div>
-                                    <div className="h-4 bg-gray-200 rounded animate-pulse flex-1"></div>
+                                    <div className="w-10 h-10 animate-pulse bg-gray-200 rounded-full mr-3"></div>
+                                    <div className="flex-1">
+                                        <div className="h-4 bg-gray-200 rounded animate-pulse mb-1"></div>
+                                        <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3"></div>
+                                    </div>
                                 </div>
                             ) : user ? (
                                 /* Mobile Logged In User */
                                 <div className="bg-gray-50 rounded-xl p-4">
                                     <div className="flex items-center mb-3">
-                                        {user.avatar ? (
+                                        {/* Enhanced Mobile Avatar */}
+                                        {user.profile?.avatar || user.avatar ? (
                                             <img
-                                                src={user.avatar}
-                                                alt={user.name || 'User'}
-                                                className="w-10 h-10 rounded-full object-cover border-2 border-gray-300 mr-3"
+                                                src={user.profile?.avatar || user.avatar}
+                                                alt={getUserDisplayName(user)}
+                                                className="w-12 h-12 rounded-full object-cover border-2 border-gray-300 mr-3"
                                             />
                                         ) : (
-                                            <div className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center text-sm font-medium mr-3">
-                                                {getUserInitials(user.name, user.email)}
+                                            <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-sm font-medium mr-3">
+                                                {getUserInitials(getUserDisplayName(user), user.email)}
                                             </div>
                                         )}
-                                        <div>
-                                            <p className="text-sm font-medium text-black">{user.name || 'User'}</p>
+
+                                        {/* Enhanced Mobile User Info */}
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold text-black truncate">
+                                                {getUserDisplayName(user)}
+                                            </p>
                                             <p className="text-xs text-gray-600 truncate">{user.email}</p>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
                                         <Link href="/account" className="block text-sm font-medium text-black p-2 rounded-lg hover:bg-gray-200">My Account</Link>
-                                        <Link href="/orders" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">My Orders</Link>
+                                        <Link href="/account/orders" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">My Orders</Link>
                                         <Link href="/wishlist" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Wishlist</Link>
                                         <button
                                             onClick={handleSignOut}
-                                            className="block w-full text-left text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white"
+                                            className="block w-full text-left text-sm text-gray-700 p-2 rounded-lg hover:bg-red-600 hover:text-white"
                                         >
                                             Sign Out
                                         </button>

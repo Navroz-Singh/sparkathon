@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
         },
         type: {
             type: String,
-            enum: ['home', 'work', 'billing', 'shipping', 'other'],
+            enum: ['home', 'office', 'other'],
             default: 'home'
         },
         label: String, // like "home", "office", etc.
@@ -55,7 +55,7 @@ const UserSchema = new mongoose.Schema({
         },
         country: {
             type: String,
-            default: 'United States'
+            default: 'India'
         },
         isDefault: {
             type: Boolean,
@@ -72,7 +72,7 @@ const UserSchema = new mongoose.Schema({
             min: { type: Number, default: 0 },
             max: { type: Number, default: 1000 }
         },
-        currency: { type: String, default: 'USD' },
+        currency: { type: String, default: 'INR' },
         notifications: {  // Change from Boolean to Object
             email: { type: Boolean, default: true },
             push: { type: Boolean, default: true },
