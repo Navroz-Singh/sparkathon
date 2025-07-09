@@ -2,14 +2,23 @@
 │   ├── account
 │   │   ├── addresses
 │   │   │   └── page.js
+│   │   ├── become-retailer
+│   │   │   └── page.js
 │   │   ├── orders
 │   │   │   ├── [id]
 │   │   │   │   └── page.js
 │   │   │   └── page.js
+│   │   ├── preferences
+│   │   │   └── page.js
 │   │   ├── profile
+│   │   │   └── page.js
+│   │   ├── security
 │   │   │   └── page.js
 │   │   ├── layout.js
 │   │   └── page.js
+│   ├── admin
+│   │   └── retailer-applications
+│   │       └── page.js
 │   ├── api
 │   │   ├── account
 │   │   │   ├── addresses
@@ -26,7 +35,25 @@
 │   │   │   │   │   │   └── route.js
 │   │   │   │   │   └── route.js
 │   │   │   │   └── route.js
-│   │   │   └── profile
+│   │   │   ├── preferences
+│   │   │   │   └── route.js
+│   │   │   ├── profile
+│   │   │   │   └── route.js
+│   │   │   └── security
+│   │   │       └── password
+│   │   │           └── route.js
+│   │   ├── admin
+│   │   │   └── retailer-applications
+│   │   │       ├── [id]
+│   │   │       │   ├── approve
+│   │   │       │   │   └── route.js
+│   │   │       │   └── reject
+│   │   │       │       └── route.js
+│   │   │       └── route.js
+│   │   ├── retailer
+│   │   │   ├── application-status
+│   │   │   │   └── route.js
+│   │   │   └── apply
 │   │   │       └── route.js
 │   │   ├── upload
 │   │   │   └── profile-picture
@@ -36,6 +63,13 @@
 │   │           └── route.js
 │   ├── login
 │   │   └── page.js
+│   ├── retailer
+│   │   ├── dashboard
+│   │   │   └── page.js
+│   │   └── products
+│   │       ├── new
+│   │       │   └── page.js
+│   │       └── page.js
 │   ├── favicon.ico
 │   ├── globals.css
 │   ├── layout.js
@@ -64,6 +98,7 @@
 │   └── store.js
 ├── models
 │   ├── Order.js
+│   ├── RetailerApplication.js
 │   └── User.js
 ├── utils
 │   ├── addressUtils.js
@@ -80,4 +115,5 @@
 ├── package.json
 ├── postcss.config.mjs
 ├── README.md
-└── temp.txt
+├── temp.txt
+└── tree.txt

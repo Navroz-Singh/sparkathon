@@ -93,6 +93,21 @@ const UserSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         }
+    },
+    retailerVerification: {
+        status: {
+            type: String,
+            enum: ['none', 'pending', 'approved', 'rejected'],
+            default: 'none'
+        },
+        appliedAt: { type: Date },
+        verifiedAt: { type: Date },
+        verifiedBy: { type: String }
+    },
+    adminPermissions: {
+        grantedAt: { type: Date },
+        grantedBy: { type: String },
+        permissions: { type: [String], default: [] }
     }
 }, {
     timestamps: true

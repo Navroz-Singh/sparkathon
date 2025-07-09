@@ -315,7 +315,7 @@ export default function SecurityPage() {
     return (
         <div className="h-full w-full">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200 bg-white">
+            <div className="p-6 rounded-xl border-b border-gray-200 bg-white">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <ShieldCheckIcon className="h-8 w-8 text-gray-600" />

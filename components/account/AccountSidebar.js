@@ -13,59 +13,153 @@ import {
     AdjustmentsHorizontalIcon,
     ArrowRightStartOnRectangleIcon,
     Bars3Icon,
-    XMarkIcon
+    XMarkIcon,
+    // New icons for retailer/admin features
+    BuildingStorefrontIcon,
+    ChartBarIcon,
+    CubeIcon,
+    DocumentCheckIcon,
+    UsersIcon,
+    ClipboardDocumentListIcon,
+    StarIcon
 } from '@heroicons/react/24/outline'
 import { useUser } from '@/hooks/useUser'
 
 /* ---------- Navigation Config ---------- */
-const useNavigationItems = () =>
-    useMemo(
-        () => [
+const useNavigationItems = (userRole) =>
+    useMemo(() => {
+        // Base navigation items (available to all users)
+        const baseItems = [
             {
                 name: 'Account Overview',
                 href: '/account',
                 icon: UserIcon,
-                description: 'Profile and account summary'
+                description: 'Profile and account summary',
+                roles: ['Buyer', 'Retailer', 'Admin']
             },
             {
                 name: 'Profile Settings',
                 href: '/account/profile',
                 icon: Cog6ToothIcon,
-                description: 'Manage your personal information'
-            },
-            {
-                name: 'Preferences',
-                href: '/account/preferences',
-                icon: AdjustmentsHorizontalIcon,
-                description: 'Shopping, notifications & privacy'
-            },
-            {
-                name: 'Security',
-                href: '/account/security',
-                icon: ShieldCheckIcon,
-                description: 'Password & account protection'
+                description: 'Manage your personal information',
+                roles: ['Buyer', 'Retailer', 'Admin']
             },
             {
                 name: 'Order History',
                 href: '/account/orders',
                 icon: ShoppingBagIcon,
-                description: 'View your past orders'
+                description: 'View your past orders',
+                roles: ['Buyer', 'Retailer', 'Admin']
             },
             {
                 name: 'Addresses',
                 href: '/account/addresses',
                 icon: MapPinIcon,
-                description: 'Manage shipping addresses'
+                description: 'Manage shipping addresses',
+                roles: ['Buyer', 'Retailer', 'Admin']
             },
             {
                 name: 'Wishlist',
                 href: '/wishlist',
                 icon: HeartIcon,
-                description: 'Your saved items'
+                description: 'Your saved items',
+                roles: ['Buyer', 'Retailer', 'Admin']
+            },
+            {
+                name: 'Preferences',
+                href: '/account/preferences',
+                icon: AdjustmentsHorizontalIcon,
+                description: 'Shopping, notifications & privacy',
+                roles: ['Buyer', 'Retailer', 'Admin']
+            },
+            {
+                name: 'Security',
+                href: '/account/security',
+                icon: ShieldCheckIcon,
+                description: 'Password & account protection',
+                roles: ['Buyer', 'Retailer', 'Admin']
             }
-        ],
-        []
-    )
+        ]
+
+        // Retailer-specific items (sorted by importance) - STORE PROFILE REMOVED
+        const retailerItems = [
+            {
+                name: 'Retailer Dashboard',
+                href: '/retailer/dashboard',
+                icon: ChartBarIcon,
+                description: 'Sales analytics & overview',
+                roles: ['Retailer']
+            },
+            {
+                name: 'Product Management',
+                href: '/retailer/products',
+                icon: CubeIcon,
+                description: 'Add & manage your products',
+                roles: ['Retailer']
+            },
+            {
+                name: 'Sales Orders',
+                href: '/retailer/orders',
+                icon: ClipboardDocumentListIcon,
+                description: 'Manage customer orders',
+                roles: ['Retailer']
+            }
+        ]
+
+        // Admin-specific items (sorted by importance)
+        const adminItems = [
+            {
+                name: 'Admin Dashboard',
+                href: '/admin/dashboard',
+                icon: ChartBarIcon,
+                description: 'Platform overview & analytics',
+                roles: ['Admin']
+            },
+            {
+                name: 'Retailer Applications',
+                href: '/admin/retailer-applications',
+                icon: DocumentCheckIcon,
+                description: 'Review retailer applications',
+                roles: ['Admin']
+            },
+            {
+                name: 'User Management',
+                href: '/admin/users',
+                icon: UsersIcon,
+                description: 'Manage platform users',
+                roles: ['Admin']
+            },
+            {
+                name: 'Product Reviews',
+                href: '/admin/products',
+                icon: StarIcon,
+                description: 'Review & approve products',
+                roles: ['Admin']
+            }
+        ]
+
+        // "Become Retailer" item for buyers who aren't retailers
+        const becomeRetailerItem = {
+            name: 'Become a Retailer',
+            href: '/account/become-retailer',
+            icon: BuildingStorefrontIcon,
+            description: 'Apply to start selling',
+            roles: ['Buyer']
+        }
+
+        // Combine items based on user role
+        let allItems = [...baseItems]
+
+        if (userRole === 'Admin') {
+            allItems = [...baseItems, ...adminItems]
+        } else if (userRole === 'Retailer') {
+            allItems = [...baseItems, ...retailerItems]
+        } else {
+            allItems = [...baseItems, becomeRetailerItem]
+        }
+
+        return allItems.filter(item => item.roles.includes(userRole))
+    }, [userRole])
 
 /* ---------- Re-usable Components ---------- */
 const NavigationItem = memo(({ item, isActive, onClick }) => {
@@ -106,6 +200,17 @@ const UserInfo = memo(({ user }) => {
         return user.email ? user.email[0].toUpperCase() : 'U'
     }, [user.profile?.name, user.email])
 
+    const getRoleBadgeColor = (role) => {
+        switch (role) {
+            case 'Admin':
+                return 'bg-red-100 text-red-800'
+            case 'Retailer':
+                return 'bg-blue-100 text-blue-800'
+            default:
+                return 'bg-gray-100 text-gray-800'
+        }
+    }
+
     return (
         <div className="flex items-center p-4 bg-gray-50 rounded-xl mb-6">
             {user.profile?.avatar ? (
@@ -116,7 +221,12 @@ const UserInfo = memo(({ user }) => {
                 </div>
             )}
             <div className="ml-3 flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{user.profile?.name || 'User'}</p>
+                <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-gray-900 truncate">{user.profile?.name || 'User'}</p>
+                    <span className={`px-2 py-1 text-xs rounded-full font-medium ${getRoleBadgeColor(user.role)}`}>
+                        {user.role}
+                    </span>
+                </div>
                 <p className="text-xs text-gray-500 truncate">{user.email}</p>
             </div>
         </div>
@@ -160,7 +270,7 @@ MobileMenuOverlay.displayName = 'MobileMenuOverlay'
 function AccountSidebar({ user }) {
     const pathname = usePathname()
     const { signOut } = useUser()
-    const navigationItems = useNavigationItems()
+    const navigationItems = useNavigationItems(user.role || 'Buyer')
     const [mobileOpen, setMobileOpen] = useState(false)
 
     const isActivePath = href => (href === '/account' ? pathname === '/account' : pathname.startsWith(href))

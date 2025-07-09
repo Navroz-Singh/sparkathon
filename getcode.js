@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 // 1. Hard-coded source directory (change as needed):
-const srcDir = path.join(__dirname, 'app/api/account/addresses');
+const srcDir = path.join(__dirname, 'app');
 
 // 2. Output file:
 const outFile = path.join(__dirname, 'temp.txt');

@@ -50,9 +50,18 @@ export async function POST(req) {
                     }
                 },
                 searchHistory: [],
+                retailerVerification: {
+                    status: 'none',
+                    appliedAt: null,
+                    verifiedAt: null,
+                    verifiedBy: null
+                },
+                adminPermissions: {
+                    grantedAt: null,
+                    grantedBy: null,
+                    permissions: []
+                },
                 viewedProducts: [],
-                wishlist: [],
-                cart: [],
                 orders: [],
                 reviews: [],
                 lastActive: new Date(),
@@ -119,20 +128,31 @@ export async function POST(req) {
                 updateData.viewedProducts = []
             }
 
-            if (!mongoUser.wishlist) {
-                updateData.wishlist = []
-            }
-
-            if (!mongoUser.cart) {
-                updateData.cart = []
-            }
-
             if (!mongoUser.orders) {
                 updateData.orders = []
             }
 
             if (!mongoUser.reviews) {
                 updateData.reviews = []
+            }
+
+            // Initialize retailerVerification for existing users
+            if (!mongoUser.retailerVerification) {
+                updateData.retailerVerification = {
+                    status: 'none',
+                    appliedAt: null,
+                    verifiedAt: null,
+                    verifiedBy: null
+                }
+            }
+
+            // Initialize adminPermissions for existing users
+            if (!mongoUser.adminPermissions) {
+                updateData.adminPermissions = {
+                    grantedAt: null,
+                    grantedBy: null,
+                    permissions: []
+                }
             }
 
             // Initialize profileEditedFields for existing users
@@ -164,10 +184,10 @@ export async function POST(req) {
             preferences: mongoUser.preferences,
             searchHistory: mongoUser.searchHistory,
             viewedProducts: mongoUser.viewedProducts,
-            wishlist: mongoUser.wishlist,
-            cart: mongoUser.cart,
             orders: mongoUser.orders,
             reviews: mongoUser.reviews,
+            retailerVerification: mongoUser.retailerVerification,
+            adminPermissions: mongoUser.adminPermissions,
             createdAt: mongoUser.createdAt,
             lastActive: mongoUser.lastActive,
         }
