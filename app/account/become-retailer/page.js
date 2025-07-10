@@ -280,7 +280,7 @@ export default function BecomeRetailerPage() {
                 </div>
 
                 {/* Application Form - Only show if no pending/approved application */}
-                {(!applicationData || applicationData.status === 'rejected') && (
+                {!applicationData && (
                     <div className="bg-gray-50 rounded-xl p-6">
                         <div className="flex items-center gap-2 mb-6">
                             <DocumentArrowUpIcon className="h-5 w-5 text-gray-600" />

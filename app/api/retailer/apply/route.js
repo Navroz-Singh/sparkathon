@@ -40,6 +40,18 @@ export async function POST(request) {
             }, { status: 400 })
         }
 
+        // Prevent re-application once the user has been rejected previously
+        const rejectedApplication = await RetailerApplication.findOne({
+            userId: mongoUser._id,
+            status: 'rejected'
+        })
+
+        if (rejectedApplication || mongoUser.retailerVerification?.status === 'rejected') {
+            return NextResponse.json({
+                error: 'Your previous application was rejected. You cannot apply again.'
+            }, { status: 400 })
+        }
+
         // Get request data
         const { businessName, businessDescription, businessCategory } = await request.json()
 

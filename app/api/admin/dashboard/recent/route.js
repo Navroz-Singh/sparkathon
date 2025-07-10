@@ -23,15 +23,16 @@ export async function GET(request) {
             return NextResponse.json({ error: 'Access denied' }, { status: 403 })
         }
 
-        // Fetch applications with user data populated
-        const applications = await RetailerApplication.find()
+        // Fetch last 5 applications with user data populated
+        const recentApplications = await RetailerApplication.find()
             .populate('userId', 'profile email')
             .sort({ createdAt: -1 })
+            .limit(5)
             .lean()
 
-        return NextResponse.json(applications)
+        return NextResponse.json(recentApplications)
     } catch (err) {
-        console.error('Error fetching retailer applications:', err)
+        console.error('Error fetching recent applications:', err)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import connectDB from '@/lib/mongodb'
-import RetailerApplication from '@/models/RetailerApplication'
 import User from '@/models/User'
+import RetailerApplication from '@/models/RetailerApplication'
 
 export async function GET(request) {
     try {
@@ -23,15 +23,29 @@ export async function GET(request) {
             return NextResponse.json({ error: 'Access denied' }, { status: 403 })
         }
 
-        // Fetch applications with user data populated
-        const applications = await RetailerApplication.find()
-            .populate('userId', 'profile email')
-            .sort({ createdAt: -1 })
-            .lean()
+        // Get platform statistics
+        const [
+            totalUsers,
+            totalRetailers,
+            pendingApplications,
+            totalApplications
+        ] = await Promise.all([
+            User.countDocuments(),
+            User.countDocuments({ role: 'Retailer' }),
+            RetailerApplication.countDocuments({ status: 'pending' }),
+            RetailerApplication.countDocuments()
+        ])
 
-        return NextResponse.json(applications)
+        const stats = {
+            totalUsers,
+            totalRetailers,
+            pendingApplications,
+            totalApplications
+        }
+
+        return NextResponse.json(stats)
     } catch (err) {
-        console.error('Error fetching retailer applications:', err)
+        console.error('Error fetching dashboard stats:', err)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }
