@@ -20,8 +20,7 @@ import {
     CubeIcon,
     DocumentCheckIcon,
     UsersIcon,
-    ClipboardDocumentListIcon,
-    StarIcon
+    ClipboardDocumentListIcon
 } from '@heroicons/react/24/outline'
 import { useUser } from '@/hooks/useUser'
 import Image from 'next/image'
@@ -128,13 +127,6 @@ const useNavigationItems = (userRole) =>
                 href: '/admin/users',
                 icon: UsersIcon,
                 description: 'Manage platform users',
-                roles: ['Admin']
-            },
-            {
-                name: 'Product Reviews',
-                href: '/admin/products',
-                icon: StarIcon,
-                description: 'Review & approve products',
                 roles: ['Admin']
             }
         ]

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import connectDB from '@/lib/mongodb'
-import RetailerApplication from '@/models/RetailerApplication'
 import User from '@/models/User'
 
 export async function GET(request) {
@@ -23,15 +22,15 @@ export async function GET(request) {
             return NextResponse.json({ error: 'Access denied' }, { status: 403 })
         }
 
-        // Fetch applications with user data populated
-        const applications = await RetailerApplication.find()
-            .populate('userId', 'profile email')
+        // Fetch all users with essential information only
+        const users = await User.find()
+            .select('profile email role createdAt retailerVerification')
             .sort({ createdAt: -1 })
             .lean()
 
-        return NextResponse.json(applications)
+        return NextResponse.json(users)
     } catch (err) {
-        console.error('Error fetching retailer applications:', err)
+        console.error('Error fetching users:', err)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }

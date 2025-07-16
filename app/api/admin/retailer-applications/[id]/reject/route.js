@@ -1,79 +1,65 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import connectDB from '@/lib/mongodb'
-import User from '@/models/User'
 import RetailerApplication from '@/models/RetailerApplication'
+import User from '@/models/User'
 
-export async function PUT(request, { params }) {
+export async function POST(request, { params }) {
     try {
-        // Verify user authentication
+        await connectDB()
+
         const supabase = await createClient()
-        const { data: { user }, error } = await supabase.auth.getUser()
+        const {
+            data: { user },
+            error
+        } = await supabase.auth.getUser()
 
         if (error || !user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        // Connect to database
-        await connectDB()
-
-        // Get admin user from MongoDB and verify role
-        const adminUser = await User.findOne({ supabaseId: user.id })
-        if (!adminUser) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 })
+        const mongoUser = await User.findOne({ supabaseId: user.id })
+        if (!mongoUser || mongoUser.role !== 'Admin') {
+            return NextResponse.json({ error: 'Access denied' }, { status: 403 })
         }
 
-        if (adminUser.role !== 'Admin') {
-            return NextResponse.json({ error: 'Access denied. Admin role required.' }, { status: 403 })
+        const applicationId = params.id
+        const body = await request.json()
+        const { rejectionReason } = body
+
+        if (!rejectionReason || rejectionReason.trim().length === 0) {
+            return NextResponse.json({ error: 'Rejection reason is required' }, { status: 400 })
         }
 
-        const { id } = params
-        const { rejectionReason } = await request.json()
-
-        // Validate rejection reason
-        if (!rejectionReason || rejectionReason.trim().length < 10) {
-            return NextResponse.json({
-                error: 'Rejection reason is required (minimum 10 characters)'
-            }, { status: 400 })
-        }
-
-        // Find the application
-        const application = await RetailerApplication.findById(id)
+        const application = await RetailerApplication.findById(applicationId)
         if (!application) {
             return NextResponse.json({ error: 'Application not found' }, { status: 404 })
         }
 
         if (application.status !== 'pending') {
-            return NextResponse.json({ error: 'Application has already been processed' }, { status: 400 })
+            return NextResponse.json({ error: 'Application already processed' }, { status: 400 })
         }
 
         // Update application status
-        const updatedApplication = await RetailerApplication.findByIdAndUpdate(
-            id,
-            {
-                status: 'rejected',
-                reviewedBy: adminUser._id,
-                reviewedAt: new Date(),
-                rejectionReason: rejectionReason.trim()
-            },
-            { new: true }
-        )
+        application.status = 'rejected'
+        application.reviewedBy = mongoUser._id
+        application.reviewedAt = new Date()
+        application.rejectionReason = rejectionReason.trim()
 
-        // Update user retailer verification status
-        await User.findByIdAndUpdate(application.userId, {
-            'retailerVerification.status': 'rejected',
-            'retailerVerification.verifiedAt': new Date(),
-            'retailerVerification.verifiedBy': adminUser._id.toString()
-        })
+        await application.save()
 
-        return NextResponse.json({
-            success: true,
-            message: 'Retailer application rejected',
-            application: updatedApplication
-        }, { status: 200 })
+        // Update user retailerVerification status
+        const applicantUser = await User.findById(application.userId)
+        if (applicantUser) {
+            applicantUser.retailerVerification.status = 'rejected'
+            applicantUser.retailerVerification.verifiedAt = new Date()
+            applicantUser.retailerVerification.verifiedBy = mongoUser._id.toString()
+            await applicantUser.save()
+        }
 
-    } catch (error) {
-        console.error('Admin reject application error:', error)
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+        return NextResponse.json({ message: 'Application rejected successfully' })
+    } catch (err) {
+        console.error('Error rejecting application:', err)
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }

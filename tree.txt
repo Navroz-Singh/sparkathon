@@ -66,8 +66,14 @@
 │   ├── retailer
 │   │   ├── dashboard
 │   │   │   └── page.js
+│   │   ├── orders
+│   │   │   ├── [id]
+│   │   │   │   └── page.js
+│   │   │   └── page.js
 │   │   └── products
-│   │       ├── new
+│   │       ├── [id]
+│   │       │   └── page.js
+│   │       ├── add
 │   │       │   └── page.js
 │   │       └── page.js
 │   ├── favicon.ico
