@@ -20,6 +20,7 @@ import {
     CreditCardIcon,
 } from '@heroicons/react/24/outline'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import Image from 'next/image'
 
 // Memoized Loading Skeleton Component
 const LoadingSkeleton = memo(() => (
@@ -365,7 +366,7 @@ const OrderItems = memo(({ items, orderTotal, paymentInfo }) => {
                         {/* Product Image */}
                         <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                             {item.image ? (
-                                <img
+                                <Image
                                     src={item.image}
                                     alt={item.name}
                                     className="w-full h-full object-cover rounded-lg"
@@ -660,7 +661,7 @@ export default function OrderDetailsPage() {
                 <div className="text-center py-16">
                     <ExclamationTriangleIcon className="h-12 w-12 text-red-500 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Order not found</h3>
-                    <p className="text-gray-500 mb-8">The order you're looking for doesn't exist or has been deleted.</p>
+                    <p className="text-gray-500 mb-8">The order you&apos;re looking for doesn&apos;t exist or has been deleted.</p>
                     <button
                         onClick={handleBack}
                         className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-colors duration-200"

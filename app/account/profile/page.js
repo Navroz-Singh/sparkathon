@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { validateProfile, formatPhoneNumber } from '@/lib/validations/userValidation'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import Image from 'next/image'
 
 // Memoized form field component
 const FormField = memo(({
@@ -103,7 +104,7 @@ const AvatarUpload = memo(({ currentAvatar, onAvatarChange, uploading, user }) =
             <div className="relative">
                 <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-200 bg-gray-100">
                     {preview ? (
-                        <img
+                        <Image
                             src={preview}
                             alt="Profile avatar"
                             className="w-full h-full object-cover"

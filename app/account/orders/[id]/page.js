@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useMemo, useCallback, useEffect, memo } from 'react'
+import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -146,7 +147,7 @@ const OrderItem = memo(({ item, onReorderItem }) => {
     return (
         <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
             {item.image && (
-                <img
+                <Image
                     src={item.image}
                     alt={item.name}
                     className="w-16 h-16 object-cover rounded-lg"

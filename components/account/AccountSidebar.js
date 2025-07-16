@@ -24,6 +24,7 @@ import {
     StarIcon
 } from '@heroicons/react/24/outline'
 import { useUser } from '@/hooks/useUser'
+import Image from 'next/image'
 
 /* ---------- Navigation Config ---------- */
 const useNavigationItems = (userRole) =>
@@ -60,7 +61,7 @@ const useNavigationItems = (userRole) =>
             },
             {
                 name: 'Wishlist',
-                href: '/wishlist',
+                href: '/account/wishlist',
                 icon: HeartIcon,
                 description: 'Your saved items',
                 roles: ['Buyer', 'Retailer', 'Admin']
@@ -214,7 +215,7 @@ const UserInfo = memo(({ user }) => {
     return (
         <div className="flex items-center p-4 bg-gray-50 rounded-xl mb-6">
             {user.profile?.avatar ? (
-                <img src={user.profile.avatar} alt={user.profile?.name || 'User'} className="w-12 h-12 rounded-full object-cover border-2 border-gray-300" />
+                <Image src={user.profile.avatar} alt={user.profile?.name || 'User'} className="w-12 h-12 rounded-full object-cover border-2 border-gray-300" />
             ) : (
                 <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center text-sm font-medium">
                     {initials}

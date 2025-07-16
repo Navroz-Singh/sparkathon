@@ -213,7 +213,7 @@ const QuickActions = memo(({ user, profileCompletion }) => {
             {
                 title: 'View Wishlist',
                 description: 'See your saved items',
-                href: '/wishlist',
+                href: '/account/wishlist',
                 icon: HeartIcon,
                 priority: 'normal'
             }
@@ -302,7 +302,7 @@ export default function AccountPage() {
                 value: user.wishlist?.length || 0,
                 description: 'Items you want to buy',
                 icon: HeartIcon,
-                href: '/wishlist',
+                href: '/account/wishlist',
                 color: 'blue',
                 badge: user.wishlist?.length > 10 ? 'Full' : null
             },

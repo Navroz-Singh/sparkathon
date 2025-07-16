@@ -14,6 +14,7 @@ import {
     CalendarIcon
 } from '@heroicons/react/24/outline'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import Image from 'next/image'
 
 const ApplicationCard = memo(({ application, onApprove, onReject, isProcessing }) => {
     const [showRejectModal, setShowRejectModal] = useState(false)
@@ -38,7 +39,7 @@ const ApplicationCard = memo(({ application, onApprove, onReject, isProcessing }
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                         {application.userId?.profile?.avatar ? (
-                            <img
+                            <Image
                                 src={application.userId.profile.avatar}
                                 alt={application.userId.profile.name}
                                 className="w-10 h-10 rounded-full object-cover"

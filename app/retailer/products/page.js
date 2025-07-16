@@ -16,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const ProductCard = memo(({ product, onStatusToggle, onDelete, isUpdating }) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -34,7 +35,7 @@ const ProductCard = memo(({ product, onStatusToggle, onDelete, isUpdating }) => 
                 <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                         {product.images && product.images.length > 0 ? (
-                            <img
+                            <Image
                                 src={product.images[0]}
                                 alt={product.name}
                                 className="w-16 h-16 object-cover rounded-lg border border-gray-200"
@@ -110,7 +111,7 @@ const ProductCard = memo(({ product, onStatusToggle, onDelete, isUpdating }) => 
                             <h3 className="text-lg font-semibold text-gray-900">Delete Product</h3>
                         </div>
                         <p className="text-gray-600 mb-6">
-                            Are you sure you want to delete "{product.name}"? This action cannot be undone.
+                            Are you sure you want to delete {product.name}? This action cannot be undone.
                         </p>
                         <div className="flex items-center gap-3">
                             <button

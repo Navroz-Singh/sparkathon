@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useMemo, useCallback, useEffect, memo } from 'react'
+import Image from 'next/image'
 import { useOrders } from '@/hooks/useOrders'
 import {
     MagnifyingGlassIcon,
@@ -99,7 +100,7 @@ const OrderCard = memo(({ order, onViewDetails, onCancel, onReorder }) => {
                     {order.items.slice(0, 3).map((item, index) => (
                         <div key={index} className="flex items-center gap-2 bg-gray-50 rounded-lg p-2 whitespace-nowrap">
                             {item.image && (
-                                <img
+                                <Image
                                     src={item.image}
                                     alt={item.name}
                                     className="w-8 h-8 object-cover rounded"

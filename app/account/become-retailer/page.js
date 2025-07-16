@@ -268,7 +268,7 @@ export default function BecomeRetailerPage() {
                 <div className="bg-blue-50 rounded-xl p-6">
                     <div className="flex items-center gap-2 mb-4">
                         <InformationCircleIcon className="h-5 w-5 text-blue-600" />
-                        <h2 className="text-lg font-semibold text-blue-900">What you'll get as a retailer</h2>
+                        <h2 className="text-lg font-semibold text-blue-900">What you&apos;ll get as a retailer</h2>
                     </div>
                     <ul className="list-disc list-inside space-y-1 text-sm text-blue-800">
                         <li>Create and manage your own store</li>
@@ -412,7 +412,7 @@ export default function BecomeRetailerPage() {
                             <h4 className="font-medium text-gray-900 mb-2">Application Process</h4>
                             <ul className="text-gray-600 space-y-1">
                                 <li>• Applications are reviewed within 2-3 business days</li>
-                                <li>• You'll receive an email notification of the decision</li>
+                                <li>• You&apos;ll receive an email notification of the decision</li>
                                 <li>• Approved retailers can immediately start listing products</li>
                             </ul>
                         </div>

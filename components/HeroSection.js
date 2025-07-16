@@ -121,16 +121,16 @@ export default function HeroSection() {
                 <div className="max-w-8xl mx-auto">
                     <div className="flex overflow-x-auto gap-4 pb-2">
                         {[
-                            { name: 'Electronics', image: 'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=400' },
-                            { name: 'Clothing', image: 'https://images.pexels.com/photos/934070/pexels-photo-934070.jpeg?auto=compress&cs=tinysrgb&w=400' },
+                            { name: 'Dairy', image: 'https://images.pexels.com/photos/5946720/pexels-photo-5946720.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500' },
+                            { name: 'Snacks', image: 'https://images.pexels.com/photos/1894325/pexels-photo-1894325.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500' },
                             { name: 'Home', image: 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=400' },
                             { name: 'Grocery', image: 'https://images.pexels.com/photos/264636/pexels-photo-264636.jpeg?auto=compress&cs=tinysrgb&w=400' },
                             { name: 'Beauty', image: 'https://images.pexels.com/photos/2113855/pexels-photo-2113855.jpeg?auto=compress&cs=tinysrgb&w=400' },
-                            { name: 'Sports', image: 'https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?auto=compress&cs=tinysrgb&w=400' }
+                            { name: 'Bakery', image: 'https://images.pexels.com/photos/17850150/pexels-photo-17850150.jpeg?cs=srgb&dl=pexels-isaacgraphy-17850150.jpg&fm=jpg' }
                         ].map((category, index) => (
                             <Link
                                 key={index}
-                                href={`/${category.name.toLowerCase()}`}
+                                href={`/category/${category.name.toLowerCase()}`}
                                 className="flex-shrink-0 group cursor-pointer"
                             >
                                 <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 w-24">
@@ -165,12 +165,12 @@ export default function HeroSection() {
 
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                         {[
-                            { name: 'Wireless Earbuds', price: '$49.99', originalPrice: '$79.99', rating: 4.5, image: 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=400' },
-                            { name: 'Smart Watch', price: '$199.99', originalPrice: '$299.99', rating: 4.8, image: 'https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=400' },
-                            { name: 'Bluetooth Speaker', price: '$39.99', originalPrice: '$59.99', rating: 4.3, image: 'https://images.pexels.com/photos/1649771/pexels-photo-1649771.jpeg?auto=compress&cs=tinysrgb&w=400' },
-                            { name: 'Phone Case', price: '$12.99', originalPrice: '$19.99', rating: 4.6, image: 'https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&w=400' },
-                            { name: 'Charging Cable', price: '$8.99', originalPrice: '$14.99', rating: 4.4, image: 'https://images.pexels.com/photos/163143/aspirin-bad-drugs-medication-163143.jpeg?auto=compress&cs=tinysrgb&w=400' },
-                            { name: 'Power Bank', price: '$24.99', originalPrice: '$39.99', rating: 4.7, image: 'https://images.pexels.com/photos/341523/pexels-photo-341523.jpeg?auto=compress&cs=tinysrgb&w=400' }
+                            { name: 'Yogurt', price: '$0.99', originalPrice: '$79.99', rating: 4.5, image: 'https://images.openfoodfacts.org/images/products/003/663/200/8350/front_en.19.400.jpg' },
+                            { name: 'Fresh Ginger Root', price: '$0.99', originalPrice: '$299.99', rating: 4.8, image: 'https://images.openfoodfacts.org/images/products/000/009/614/7450/front_en.23.400.jpg' },
+                            { name: 'Organic White Onions', price: '$0.19', originalPrice: '$59.99', rating: 4.3, image: 'https://images.openfoodfacts.org/images/products/009/222/797/5322/front_en.25.400.jpg' },
+                            { name: 'Organic Bosc Pear', price: '$1.99', originalPrice: '$19.99', rating: 4.6, image: 'https://images.rawpixel.com/image_1300/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvcGR3YXRlcmNvbG9yZnJ1aXRiYXRjaDEtMTA5MC1nbG95LWJfMS5qcGc.jpg' },
+                            { name: 'Organic Diced Tomatoes', price: '$2.99', originalPrice: '$14.99', rating: 4.4, image: 'https://images.openfoodfacts.org/images/products/009/661/993/7325/front_en.42.400.jpg' },
+                            { name: 'Organic Bell Pepper', price: '$24.99', originalPrice: '$39.99', rating: 4.7, image: 'https://images.openfoodfacts.org/images/products/356/470/711/8637/front_fr.21.400.jpg' }
                         ].map((product, index) => (
                             <div key={index} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
                                 <div className="aspect-square relative">

@@ -165,7 +165,7 @@ export function useUser() {
             subscription.unsubscribe()
             document.removeEventListener('visibilitychange', handleVisibilityChange)
         }
-    }, []) // Empty dependency array to prevent re-runs
+    },[]) // Empty dependency array to prevent re-runs
 
     // Auth functions
     const signIn = async (email, password) => {

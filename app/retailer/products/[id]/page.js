@@ -17,6 +17,7 @@ import {
     ArchiveBoxXMarkIcon
 } from '@heroicons/react/24/outline'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import Image from 'next/image'
 
 // Memoized Loading Skeleton Component
 const LoadingSkeleton = memo(() => (
@@ -51,7 +52,7 @@ const PageHeader = memo(({ productName, onBack, onViewProduct, onDeleteProduct, 
             </button>
             <div className="flex-1">
                 <h1 className="text-3xl font-bold text-gray-900">Edit Product</h1>
-                <p className="text-gray-600 mt-2">Update "{productName}" details and settings</p>
+                <p className="text-gray-600 mt-2">Update {productName} details and settings</p>
             </div>
             <div className="flex items-center gap-3">
                 <button
@@ -167,7 +168,7 @@ const ImageUpload = memo(({ images, onImagesChange, maxImages = 5 }) => {
                 {images.map((image) => (
                     <div key={image.id} className="relative group">
                         <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                            <img
+                            <Image
                                 src={image.url}
                                 alt={image.name}
                                 className="w-full h-full object-cover"
@@ -776,7 +777,7 @@ export default function EditProductPage() {
                 <div className="text-center py-16">
                     <ExclamationTriangleIcon className="h-12 w-12 text-red-500 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Product not found</h3>
-                    <p className="text-gray-500 mb-8">The product you're looking for doesn't exist or has been deleted.</p>
+                    <p className="text-gray-500 mb-8">The product you&apos;re looking for doesn&apos;t exist or has been deleted.</p>
                     <button
                         onClick={handleBack}
                         className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-colors duration-200"

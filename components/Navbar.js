@@ -11,15 +11,79 @@ import {
     UserIcon,
     ArrowRightStartOnRectangleIcon
 } from '@heroicons/react/24/outline'
-import { useState } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useUser } from '@/hooks/useUser'
+import { useProduct } from '@/hooks/useProducts'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 export default function Navbar() {
     const [isSubpageOpen, setIsSubpageOpen] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+    const [search, setSearch] = useState('')
+    const [showSuggestions, setShowSuggestions] = useState(false)
+    const searchRef = useRef(null)
+    const suggestionBoxRef = useRef(null)
+    const router = useRouter()
 
     const { user, loading, signOut } = useUser()
+
+    // Product search
+    const { products, getProducts } = useProduct()
+    const [searchLoading, setSearchLoading] = useState(false)
+    const [productsLoaded, setProductsLoaded] = useState(false)
+
+    // Fetch all products on first focus (simulate loading)
+    useEffect(() => {
+        if (showSuggestions && !productsLoaded && !searchLoading) {
+            setSearchLoading(true)
+            // Simulate network delay
+            setTimeout(() => {
+                getProducts().finally(() => {
+                    setSearchLoading(false)
+                    setProductsLoaded(true)
+                })
+            }, 500) // 1s simulated loading
+        }
+    }, [showSuggestions, productsLoaded, getProducts, searchLoading])
+
+    // Filtered suggestions (max 6)
+    const suggestions = useMemo(() => {
+        if (!search || !products.length) return [];
+        return products
+            .filter(p =>
+                p.name?.toLowerCase().includes(search.toLowerCase()) ||
+                p.description?.toLowerCase().includes(search.toLowerCase())
+            )
+            .slice(0, 6);
+    }, [search, products]);
+    
+
+    // Handle clicking a suggestion
+    const handleSuggestionClick = useCallback((id) => {
+        setShowSuggestions(false)
+        setSearch('')
+        router.push(`/product/${id}`)
+    }, [router])
+
+    // Handle click outside to close suggestions
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                suggestionBoxRef.current &&
+                !suggestionBoxRef.current.contains(event.target) &&
+                searchRef.current &&
+                !searchRef.current.contains(event.target)
+            ) {
+                setShowSuggestions(false)
+            }
+        }
+        if (showSuggestions) {
+            document.addEventListener('mousedown', handleClickOutside)
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [showSuggestions])
 
     const handleSignOut = async () => {
         await signOut()
@@ -52,7 +116,7 @@ export default function Navbar() {
                 <div className="w-full px-6 lg:px-12">
                     <div className="flex items-center justify-between h-16">
 
-                        {/* Left: Walmart Branding */}
+                        {/* Left: Branding */}
                         <div className="flex-shrink-0">
                             <Link href="/" className="flex items-center">
                                 <span className="text-lg font-bold text-black tracking-wide hover:text-gray-700 transition-colors duration-200">
@@ -62,26 +126,85 @@ export default function Navbar() {
                         </div>
 
                         {/* Center: Search Bar with AI Button */}
-                        <div className="flex-1 max-w-lg mx-8">
+                        <div className="flex-1 max-w-lg mx-8 relative">
                             <div className="relative flex items-center">
                                 <div className="relative flex-1">
                                     <input
+                                        ref={searchRef}
                                         type="text"
                                         placeholder="Search products..."
                                         className="w-full pl-4 pr-12 py-2 text-sm border-2 border-black rounded-full bg-white text-black placeholder:text-gray-500 focus:ring-2 focus:ring-black focus:border-black focus:outline-none transition-all duration-200"
+                                        value={search}
+                                        onChange={e => {
+                                            setSearch(e.target.value)
+                                            setShowSuggestions(true)
+                                        }}
+                                        onFocus={() => setShowSuggestions(true)}
+                                        autoComplete="off"
                                     />
-                                    <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-black transition-colors duration-200">
+                                    <button
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-black transition-colors duration-200"
+                                        tabIndex={-1}
+                                    >
                                         <MagnifyingGlassIcon className="h-4 w-4" />
                                     </button>
+
+                                    {/* Suggestions Dropdown */}
+                                    {showSuggestions && search && (
+                                        <div
+                                            ref={suggestionBoxRef}
+                                            className="absolute left-0 right-0 mt-2 z-30 bg-white border border-gray-200 rounded-xl shadow-lg"
+                                        >
+                                            {searchLoading ? (
+                                            <div className="p-4 text-sm text-gray-600 flex items-center">
+                                                <svg className="animate-spin h-5 w-5 mr-2 text-gray-500" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                                </svg>
+                                                Loading...
+                                            </div>
+                                            ) : suggestions.length > 0 ? (
+                                            suggestions.map(suggestion => (
+                                                <button
+                                                key={suggestion.productId}
+                                                onClick={() => handleSuggestionClick(suggestion.productId)}
+                                                className="w-full flex items-center px-4 py-2 text-left hover:bg-gray-100 transition-colors duration-150"
+                                                >
+                                                <div className="w-8 h-8 rounded-lg overflow-hidden bg-gray-100 mr-3 flex-shrink-0 relative">
+                                                    <Image
+                                                        src={
+                                                        typeof suggestion.images?.[0].url === "string" && suggestion.images[0].url.trim()
+                                                            ? suggestion.images[0].url
+                                                            : "/placeholder.png"
+                                                        }
+                                                        alt="Product"
+                                                        fill
+                                                        className="object-cover"
+                                                        sizes="32px"
+                                                        priority={false}
+                                                    />
+                                                    </div>
+
+                                                <span className="font-medium text-gray-900 truncate">{suggestion.name}</span>
+                                                <span className="ml-auto text-xs text-gray-500">₹{suggestion.price}</span>
+                                                </button>
+                                            ))
+                                            ) : (
+                                            <div className="p-4 text-sm text-gray-500">No products found.</div>
+                                            )}
+                                        </div>
+                                        )}
+
                                 </div>
 
-                                {/* AI Button with Icon and Tooltip */}
-                                <button
+                                {/* AI Button */}
+                                <Link
+                                    href="/bothelp" // <-- change to your desired route
                                     className="ml-2 px-3 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center"
                                     title="Search using AI"
-                                >
+                                    >
                                     <SparklesIcon className="h-4 w-4" />
-                                </button>
+                                </Link>
                             </div>
                         </div>
 
@@ -107,12 +230,13 @@ export default function Navbar() {
                                 {isSubpageOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border-2 border-black z-50">
                                         <div className="py-2">
-                                            <Link href="/electronics" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Electronics</Link>
-                                            <Link href="/clothing" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Clothing & Accessories</Link>
-                                            <Link href="/home-garden" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Home & Garden</Link>
-                                            <Link href="/grocery" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Grocery</Link>
-                                            <Link href="/pharmacy" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Pharmacy</Link>
-                                            <Link href="/auto" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Auto & Tires</Link>
+                                            <Link href="/category/bakery" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Bakery</Link>
+                                            <Link href="/category/beverage" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Beverage</Link>
+                                            <Link href="/category/cleaning" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Cleaning</Link>
+                                            <Link href="/category/dairy" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Dairy</Link>
+                                            <Link href="/category/grocery" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Grocery</Link>
+                                            <Link href="/category/personal Care" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Personal Care</Link>
+                                            <Link href="/category/snacks" className="block px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2">Snacks</Link>
                                         </div>
                                     </div>
                                 )}
@@ -139,7 +263,7 @@ export default function Navbar() {
                                     >
                                         {/* User Avatar */}
                                         {user.profile?.avatar || user.avatar ? (
-                                            <img
+                                            <Image
                                                 src={user.profile?.avatar || user.avatar}
                                                 alt={getUserDisplayName(user)}
                                                 className="w-8 h-8 rounded-full object-cover border-2 border-gray-300"
@@ -187,7 +311,7 @@ export default function Navbar() {
                                                     My Orders
                                                 </Link>
                                                 <Link
-                                                    href="/wishlist"
+                                                    href="/account/wishlist"
                                                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-black hover:text-white rounded-lg mx-2"
                                                     onClick={() => setIsUserMenuOpen(false)}
                                                 >
@@ -252,7 +376,7 @@ export default function Navbar() {
                                     <div className="flex items-center mb-3">
                                         {/* Enhanced Mobile Avatar */}
                                         {user.profile?.avatar || user.avatar ? (
-                                            <img
+                                            <Image
                                                 src={user.profile?.avatar || user.avatar}
                                                 alt={getUserDisplayName(user)}
                                                 className="w-12 h-12 rounded-full object-cover border-2 border-gray-300 mr-3"
@@ -295,12 +419,13 @@ export default function Navbar() {
                             <div className="space-y-3">
                                 <Link href="/categories" className="block text-sm font-semibold text-black p-2 rounded-lg hover:bg-gray-100">All Categories</Link>
                                 <div className="space-y-2 pl-4">
-                                    <Link href="/electronics" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Electronics</Link>
-                                    <Link href="/clothing" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Clothing & Accessories</Link>
-                                    <Link href="/home-garden" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Home & Garden</Link>
-                                    <Link href="/grocery" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Grocery</Link>
-                                    <Link href="/pharmacy" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Pharmacy</Link>
-                                    <Link href="/auto" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Auto & Tires</Link>
+                                    <Link href="/category/bakery" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Bakery</Link>
+                                    <Link href="/category/beverage" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Beverage</Link>
+                                    <Link href="/category/cleaning" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Cleaning</Link>
+                                    <Link href="/category/dairy" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Dairy</Link>
+                                    <Link href="/category/grocery" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Grocery</Link>
+                                    <Link href="/category/personal Care" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Personal Care</Link>
+                                    <Link href="/category/snacks" className="block text-sm text-gray-700 p-2 rounded-lg hover:bg-black hover:text-white">Snacks</Link>
                                 </div>
                                 <Link href="/cart" className="flex items-center text-sm font-medium text-black p-2 rounded-lg hover:bg-gray-100">
                                     <ShoppingCartIcon className="h-4 w-4 mr-2 stroke-2" />
